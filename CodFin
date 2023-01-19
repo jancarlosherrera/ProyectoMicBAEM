@@ -8,8 +8,7 @@ char Bluetooth_Read(void); //Read data from Rx5 pin of TM4C123
 void Bluetooth_Write(unsigned char data); // Transmit a character to HC-05 over Tx5 pin
 void Bluetooth_Write_String(char *str); // Transmit a string to HC-05 over Tx5 pin
 int LM35(void);
-int interrup(int cont);
-void interm(void);
+int interrup(int cont
 uint32_t i,t, Cta,control,PETR,cont,iter;
 int LimPB = 5;
 int LimP1 = 12;
@@ -69,12 +68,12 @@ int main(void)
                  do{
                             Cta++;
                             PETR=(Cta*10)/(292/2);
-                            if (PETR<16){
+                            if (PETR<7){
                                control=1;
-                           }else if (PETR>26){
+                           }else if (PETR>17){
                                control=3;
-                           }else if (PETR>13){
-                                if (PETR<30){
+                           }else if (PETR>9){
+                                if (PETR<19){
                                     control=2;
                                 }
                             }
@@ -105,11 +104,12 @@ int main(void)
                    if (PETR!=LimPB){
                        if (PETR>LimP1){
                         GPIO_PORTM_DATA_R = 0X02;
-                        for(t=0 ; t<3000000 ; t++);
-                        for(t=0 ; t<10000 ; t++);
+                        SysCtlDelay(2666666);
+                        //for(t=0 ; t<4500000 ; t++);
+//                        for(t=0 ; t<5000 ; t++);
                        }
                    GPIO_PORTM_DATA_R = 0X02;
-                   for(t=0 ; t<3000000 ; t++);
+                   for(t=0 ; t<4500000 ; t++);
                    GPIO_PORTM_DATA_R = 0X00;}
                    Bluetooth_Write_String("El elevador se encuentra en PB\n");
                 }
@@ -121,11 +121,12 @@ int main(void)
                    if (PETR!=LimP2){
                        if (PETR<LimP2){
                         GPIO_PORTM_DATA_R = 0X01;
-                        for(t=0 ; t<3000000 ; t++);
-                        for(t=0 ; t<10000 ; t++);
+                        SysCtlDelay(2666666);
+//                        for(t=0 ; t<4500000 ; t++);
+//                        for(t=0 ; t<10000 ; t++);
                        }
                    GPIO_PORTM_DATA_R = 0X01;
-                   for(t=0 ; t<3000000 ; t++);
+                   for(t=0 ; t<4500000 ; t++);
                    GPIO_PORTM_DATA_R = 0X00;}
                    Bluetooth_Write_String("El elevador se encuentra en P2\n");
 
@@ -133,14 +134,24 @@ int main(void)
                     Bluetooth_Write_String("El elevador se encuentra en P");
                    Bluetooth_Write_String(&control);
                    Bluetooth_Write_String("\n");
-                   if (PETR<=LimPB){
-                       GPIO_PORTM_DATA_R = 0X01;
-                       for(t=0 ; t<3000000 ; t++);
-
-                   }else if(PETR>=LimP2){
+                   //PETR = 22;
+                   switch(control){
+                   case 3:
                        GPIO_PORTM_DATA_R = 0X02;
-                       for(t=0 ; t<3000000 ; t++);
+                       SysCtlDelay(13333333);
+                       GPIO_PORTM_DATA_R = 0X00;
+                       break;
+                   case 1:
+                       GPIO_PORTM_DATA_R = 0X01;
+                       SysCtlDelay(13333333);
+                       GPIO_PORTM_DATA_R = 0X00;
                    }
+
+                       //for(t=0 ; t<450000 ; t++);
+
+
+                       //for(t=0 ; t<450000 ; t++);
+
 
 
             }else if( c=='E'){
@@ -174,7 +185,7 @@ void HC05_init(void)
             UART4_CTL_R = 0;         /* UART4 module disable */
            UART4_IBRD_R = 104;      /* for 9600 baud rate, integer = 104 */
            UART4_FBRD_R = 11;       /* for 9600 baud rate, fractional = 11*/
-           UART4_CC_R = 0;          /*select system clock*/
+           UART4_CC_R = 0;          /select system clock/
            UART4_LCRH_R = 0x60;     /* data lenght 8-bit, not parity bit, no FIFO */
            UART4_CTL_R = 0x301;     /* Enable UART4 module, Rx and Tx */
 
